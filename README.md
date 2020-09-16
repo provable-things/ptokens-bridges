@@ -1,3 +1,3 @@
 ### pTokens Strongbox
 
-Android apps providing a thin layer to interact with the pToken core library.
+Wrapper to execute pTokens on a Strongbox-enabled device and to generate Google-backed attestations

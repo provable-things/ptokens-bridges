@@ -90,15 +90,7 @@ lint/tmp/
 node_modules
 
 
-# Temporary json
-.*.temp.json
+# Rust 
+target
 
-enclave-proxy/log.txt
-enclave-proxy/*-init.json
-enclave-proxy/.*-init-output.json
-enclave-proxy/.start_*
-enclave-proxy/*.lock
-
-# Backup/restore tmp files
-deploy/host/backup/databases
-deploy/host/backup/files
+*.gpg

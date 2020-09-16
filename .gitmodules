@@ -1,0 +1,3 @@
+[submodule "pbtc-on-eth/core"]
+	path = pbtc-on-eth/core
+	url = https://github.com/provable-things/ptokens-core
