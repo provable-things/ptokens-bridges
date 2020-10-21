@@ -46,6 +46,10 @@ android {
             )
         }
         release {
+             buildConfigField("String",
+                    "SAFETY_NET_APIKEY",
+                    "\"${local["safetynet.apikey"]}\""
+            )
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
