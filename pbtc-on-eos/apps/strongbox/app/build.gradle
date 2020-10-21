@@ -1,0 +1,105 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+
+InputStream localFile = rootProject
+    .file('local.properties')
+    .newDataInputStream()
+
+Properties local = new Properties()
+
+local.load(localFile)
+
+def ptokensBridge = "p${local['conf.nativeSymbol']}on${local['conf.hostSymbol']}"
+def ptokensAppId = "io.ptokens.${ptokensBridge}"
+def ptokensModuleName = "../common/jni/p${local['conf.nativeSymbol']}-on-${local['conf.hostSymbol']}"
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "${ptokensAppId}"
+        minSdkVersion 28
+        targetSdkVersion 28 // beaware changing this to an higher value: https://developer.android.com/preview/privacy/storage (EACCESS error) 
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile rootProject.file("testnet.keystore");
+            storePassword local['keystore.store_password']
+            keyAlias local['keystore.key_alias']
+            keyPassword local['keystore.key_password']
+            v2SigningEnabled true
+        }
+    }
+    
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+
+            buildConfigField("String",
+                    "SAFETY_NET_APIKEY",
+                    "\"${local["safetynet.apikey"]}\""
+            )
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    defaultConfig {
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+}
+
+task exportApk {
+    doLast {
+        copy {
+            println "   Copying apk from build/ to .."
+            from "build/outputs/apk/debug/app-debug.apk"
+            into "../"
+            rename "app-debug.apk", "app-${ptokensBridge}-debug.apk"
+        }    
+    }
+    
+    dependsOn "assembleDebug"
+}
+
+cargo {
+    module  = "${ptokensModuleName}"
+    libname = "app_jni"
+    targets = ["arm"]
+    profile = "release"
+}
+
+preBuild {
+    dependsOn "cargoBuild"
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.snappydb:snappydb-lib:0.5.0'
+    implementation "commons-codec:commons-codec:1.9"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.gms:play-services-safetynet:15.0.1'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.8.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.4'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation project(path: ':common')
+    implementation project(path: ':sqlite3')
+}
