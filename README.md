@@ -1,3 +1,3 @@
-### pTokens Strongbox
+### pTokens Bridges
 
-Wrapper to execute pTokens on a Strongbox-enabled device and to generate Google-backed attestations
+Wrappers to execute pTokens on a Strongbox-enabled device and to generate Google-backed attestations
