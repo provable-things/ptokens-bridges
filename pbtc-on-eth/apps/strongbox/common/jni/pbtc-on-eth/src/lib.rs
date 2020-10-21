@@ -13,34 +13,27 @@ use crate::{
     initialize_logger::initialize_logger,
 };
 
-use ptokens_core::{
-    btc_on_eth::{
-        get_enclave_state::get_enclave_state,
-        get_latest_block_numbers::get_latest_block_numbers,
-        debug_functions::{
-            debug_mint_pbtc,
-            debug_get_all_utxos,
-            debug_get_key_from_db,
-            debug_get_all_db_keys,
-            debug_clear_all_utxos,
-            debug_reprocess_btc_block,
-            debug_reprocess_eth_block,
-            debug_maybe_add_utxo_to_db,
-            debug_set_key_in_db_to_value,
-            debug_get_signed_erc777_change_pnetwork_tx,
-            debug_get_signed_erc777_proxy_change_pnetwork_tx,
-            debug_get_signed_erc777_proxy_change_pnetwork_by_proxy_tx,
-        },
-        eth::{
-            submit_eth_block::submit_eth_block_to_enclave,
-            initialize_eth::initialize_eth_enclave::maybe_initialize_eth_enclave,
-            eth_message_signer::sign_message_with_eth_key,
-        },
-        btc::{
-            submit_btc_block::submit_btc_block_to_enclave,
-            initialize_btc::initialize_btc_enclave::maybe_initialize_btc_enclave,
-        },
-    }
+use ptokens_core::chains::eth::eth_message_signer::sign_message_with_eth_key;
+
+use ptokens_core::btc_on_eth::{
+    debug_mint_pbtc,
+    get_enclave_state,
+    debug_get_all_utxos,
+    debug_get_all_db_keys,
+    debug_get_key_from_db,
+    debug_clear_all_utxos,
+    get_latest_block_numbers,
+    debug_reprocess_btc_block,
+    debug_reprocess_eth_block,
+    debug_maybe_add_utxo_to_db,
+    submit_btc_block_to_enclave,
+    submit_eth_block_to_enclave,
+    debug_set_key_in_db_to_value,
+    maybe_initialize_btc_enclave,
+    maybe_initialize_eth_enclave,
+    debug_get_signed_erc777_change_pnetwork_tx,
+    debug_get_signed_erc777_proxy_change_pnetwork_tx,
+    debug_get_signed_erc777_proxy_change_pnetwork_by_proxy_tx,
 };
 
 use jni::{

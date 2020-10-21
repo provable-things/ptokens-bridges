@@ -1,5 +1,4 @@
 package io.ptokens.commands;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -45,11 +44,22 @@ public abstract class CommandInterface {
     }
 
     Command getGenerateProofBuilder() {
-        Command b = builder.copy()
-                .needsReadableDatabase()
-                .async();
-
-        return b;
+        Command c = null;
+        try {
+            c = builder.copy()
+                    .needsReadableDatabase()
+                    .addIntentArg(
+                            INTENT_SAFETYNET_INCLUDED,
+                            DEFAULT_SAFETYNET_INCLUDED,
+                            Boolean.class)
+                    .async();
+        } catch (InvalidCommandException e) {
+            Log.v(TAG, "Addition of intent "
+                    + INTENT_SAFETYNET_INCLUDED
+                    + " failed:", e
+            );
+        }
+        return c;
     }
 
     Command getNativeAndReadabledDbBuilder() {
@@ -167,7 +177,7 @@ public abstract class CommandInterface {
         return c;
     }
 
-    Command getDebugErc777ChangePNetworkBuilder() {
+    Command getWriteableDbWithAddressParameterBuilder() {
         Command c = null;
         try {
             c = builder.copy()
