@@ -16,7 +16,7 @@ A configuration file called `local.properties` must have the following:
  - `conf.hostSymbol`: Host symbol
 
 ```bash 
-./gradlew assembleRelease exportApk
+./gradlew assembleRelease
 ```
 
 ### Show nice logs:

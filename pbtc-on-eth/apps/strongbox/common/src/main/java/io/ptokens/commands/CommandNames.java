@@ -29,10 +29,19 @@ class CommandNames {
     static final String ENABLE_EOS_PROTOCOL_FEATURE = "enableEosProtocolFeature";
     static final String DISABLE_EOS_PROTOCOL_FEATURE = "disableEosProtocolFeature";
     static final String SIGN_MESSAGE_WITH_ETH_KEY = "signMessageWithEthKey";
+    static final String DEBUG_BACKUP_DATABASE = "debugExportDatabaseToSd";
+    static final String DEBUG_IMPORT_DATABASE = "debugImportDatabaseFromSd";
 
     static final String DEBUG_CHANGE_PNETWORK_TX = "debugErc777ChangePNetwork";
     static final String DEBUG_PROXY_CHANGE_PNETWORK_TX = "debugErc777ProxyChangePNetwork";
     static final String DEBUG_PROXY_CHANGE_PNETWORK_BY_PROXY_TX = "debugErc777ProxyChangePNetworkByProxy";
+
+
+    static final String DEBUG_GET_PERC20_MIGRATION_TX = "debugMigrateContract";
+    static final String DEBUG_ADD_ERC20_DICTIONARY_ENTRY = "debugAddErc20DictionaryEntry";
+    static final String DEBUG_GET_ADD_SUPPORTED_TOKEN_TX = "debugGetAddSupportedTokenTx";
+    static final String DEBUG_GET_REMOVE_SUPPORTED_TOKEN_TX = "debugGetRemoveSupportedTokenTx";
+    static final String DEBUG_REMOVE_ERC20_DICTIONARY_ENTRY = "debugRemoveErc20DictionaryEntry";
 
     /*
      * Default intent values
@@ -49,8 +58,9 @@ class CommandNames {
     static final String DEFAULT_BTC_DIFFICULTY = "1337";
     static final String DEFAULT_BTC_NETWORK = "Testnet";
     static final String DEFAULT_BTC_CONFS = "0";
+    static final String DEFAULT_SAFETYNET_INCLUDED = "false";
 
-    /* 
+    /*
      * Intent's parameters names
      */
     static final String INTENT_GAS_PRICE_NAME = "gasPrice";
@@ -76,4 +86,6 @@ class CommandNames {
     static final String INTENT_NONCE_NAME = "nonce";
     static final String INTENT_ETH_NETWORK_NAME = "ethNetwork";
     static final String INTENT_RECIPIENT_NAME = "recipient";
+
+    static final String INTENT_SAFETYNET_INCLUDED = "safetyNetIncluded";
 }

@@ -42,14 +42,15 @@ android {
                     "SAFETY_NET_APIKEY",
                     "\"${local["safetynet.apikey"]}\""
             )
+            signingConfig signingConfigs.release
         }
+
         release {
             buildConfigField("String",
                     "SAFETY_NET_APIKEY",
                     "\"${local["safetynet.apikey"]}\""
             )
-            signingConfig signingConfigs.release
-
+                        
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -79,8 +80,8 @@ task exportApk {
     doLast {
         copy {
             println "Copying apk..."
-            from "build/outputs/apk/release/app-release.apk"
-            rename "app-release.apk", "app-release.apk"
+            from "build/outputs/apk/debug/app-debug.apk"
+            rename "app-debug.apk", "app-debug.apk"
             into "../"
         }
     }
