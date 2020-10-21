@@ -1,0 +1,13 @@
+[package]
+name = "pbtc_on_eos"
+version = "0.2.0"
+authors = ["gregkapka <greg@oraclize.it>"]
+
+[dependencies]
+log = "0.4.8"
+docopt = "1.1.0"
+rocksdb = "0.13.0"
+simplelog = "0.7.3"
+serde_derive = "1.0.101"
+serde = { version = "1", features = ["derive"] }
+ptokens_core = { path = "../../core", features = ["debug"] }

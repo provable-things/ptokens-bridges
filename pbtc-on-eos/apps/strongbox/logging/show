@@ -1,0 +1,68 @@
+#!/bin/bash
+
+
+function show_usage() {
+	echo "usage: ./launch_logging.sh <device_id> <level> [log_file]"
+}
+
+if [[ $# -le 1 || $# -gt 3 ]]; then
+	show_usage
+	exit 1
+fi
+
+host_symbol=`grep "HOST_SYMBOL" ../.env | tr '=' ' ' | awk '{print $2}'`
+native_symbol=`grep "^NATIVE_SYMBOL" ../.env | tr '=' ' ' | awk '{print $2}'`
+
+# Smart selection of the apk 
+# we want to log 
+SRC_PATHS=( \
+	"../common/src/main/java/io/ptokens/" \
+	"../app/src/main/java/io/ptokens/" \
+)
+
+# Each class defines a TAG string used
+# to filter only the logs we are interested
+# in. The TAG is the class name returned 
+# by getClassName() method. Here we build
+# filterspecs containing all the TAGs we care
+# about
+filterspecs=""
+for src_path in ${SRC_PATHS[@]}; do	
+	echo "$src_path"
+	filterspecs=$filterspecs" `cd $src_path && \
+		find . \
+		| grep java \
+		| tr '.' ' ' \
+		| awk '{print $1}' \
+		| tr '/' '.' \
+		| awk '{print "io.ptokens"$1":'$2'"}' \
+		| tr '\n' ' '`"
+done
+filterspecs=$filterspecs" \
+	AndroidRuntime \
+	SQLiteLog \
+	AndroidRuntime"
+
+#echo "$filterspecs"
+
+if [[ $# == 2 ]]; then
+	adb -s $1 \
+		logcat \
+		-v color \
+	    -v UTC \
+	    $filterspecs \
+	    *:S
+elif [[ $# == 3 ]]; then
+	adb -s $1 \
+		exec-out \
+		logcat \
+		-f $3 \
+		-r 10000 \
+		-n 10 \
+	    -v time \
+	    $filterspecs \
+	    *:S
+else 
+	show_usage
+	exit 1
+fi

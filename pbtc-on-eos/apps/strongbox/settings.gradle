@@ -1,0 +1,3 @@
+rootProject.name='strongbox'
+include ':common', ':sqlite3'
+include ':app'
