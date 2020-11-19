@@ -16,10 +16,9 @@ import java.time.Instant;
 
 import io.ptokens.commands.Command;
 import io.ptokens.commands.CommandInterface;
-import io.ptokens.data.EnclaveState;
-import io.ptokens.data.PBtcOnEosState;
 import io.ptokens.database.DatabaseException;
 import io.ptokens.database.DatabaseWiring;
+import io.ptokens.database.SQLiteHelper;
 import io.ptokens.safetynet.SafetyNetHelper;
 import io.ptokens.safetynet.Utils;
 import io.ptokens.utils.Logger;
@@ -31,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static boolean FLAG_VERIFY_STATE_HASH = false;
 
     protected static final int SAFETY_NET_TIMEOUT_BETWEEN_RETRIES = 1000;
-    protected static final int SAFETY_NET_MAX_RETRIES = 5;
+    protected static final int SAFETY_NET_MAX_RETRIES = 2;
 
     protected Command builder;
     protected Logger logger;
@@ -65,7 +64,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unused")
-    public void generateProof(String apiKey, byte[] cborState) {
+    public String debugExportDatabaseToSd() {
+        SQLiteHelper.copyDatabaseToSdCard(mContext);
+
+        return "✔ Database successfully copied to sdcard/";
+    }
+
+    @SuppressWarnings("unused")
+    public String debugImportDatabaseFromSd() {
+        SQLiteHelper.copyDatabaseFromSdCard(mContext);
+
+        return "✔ Database successfully imported from sdcard/";
+    }
+
+    @SuppressWarnings("unused")
+    public void generateProof(String type, String apiKey, byte[] cborState) {
         String[] apkCertificateDigest = Utils.calcApkCertificateDigests(mContext);
         String apkDigest = Utils.calcApkDigest(getApplicationContext());
         int timestamp = (int) Instant
@@ -78,6 +91,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setCurrentState(cborState)
                 .setApkCertDigest(apkCertificateDigest)
                 .setApkDigest(apkDigest)
+                .setProofType(type)
+                .setApiKey(apiKey)
                 .setCommitmentTimestamp(timestamp)
                 .setTimeoutBetweenRetries(SAFETY_NET_TIMEOUT_BETWEEN_RETRIES)
                 .setRetriesMax(SAFETY_NET_MAX_RETRIES)

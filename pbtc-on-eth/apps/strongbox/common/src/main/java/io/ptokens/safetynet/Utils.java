@@ -104,12 +104,7 @@ public class Utils {
             AttestationObject attestationObject = new AttestationObject(jwsResult);
             byte[] cborData = mapper.writeValueAsBytes(attestationObject);
 
-            String proofPrefixString = "AP";
-            byte androidProofVersion = 2;
-
             ByteArrayOutputStream ba = new ByteArrayOutputStream();
-            ba.write(proofPrefixString.getBytes(Charset.forName("UTF8")));
-            ba.write(androidProofVersion);
             ba.write(cborData);
 
             result = Base64.encodeToString(ba.toByteArray(), Base64.DEFAULT)

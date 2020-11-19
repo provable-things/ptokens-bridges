@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.AbstractWindowedCursor;
 import android.database.CursorWindow;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
 
@@ -11,7 +12,12 @@ import org.sqlite.database.sqlite.SQLiteCursor;
 import org.sqlite.database.sqlite.SQLiteDatabase;
 import org.sqlite.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import io.ptokens.utils.Operations;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
     private final static String TAG = SQLiteHelper.class.getName();
@@ -30,6 +36,52 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Database path "
                 + context.getDatabasePath(DATABASE_NAME).getAbsolutePath()
         );
+    }
+
+    public static void copyDatabaseToSdCard(Context context) {
+        File src = context.getDatabasePath(DATABASE_NAME);
+        Log.d(TAG, "Copying " + DATABASE_NAME + " to /sdcard...");
+        File dest = Paths.get(
+                Environment.getExternalStorageDirectory()
+                        .getPath(),
+                DATABASE_NAME
+        ).toFile();
+
+        try {
+            Operations.copy(src, dest);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to copy the database to " + dest.getPath(), e);
+        }
+    }
+
+    /**
+     * Place the database to import inside the sdcard with
+     * the expected DATABASE_NAME
+     * @param context
+     */
+    public static void copyDatabaseFromSdCard(Context context) {
+
+        File src = Paths.get(
+                Environment.getExternalStorageDirectory()
+                        .getPath(),
+                DATABASE_NAME
+        ).toFile();
+        File dest = context.getDatabasePath(DATABASE_NAME);
+        Log.d(TAG, "Copying " + DATABASE_NAME + " from /sdcard/ " + DATABASE_NAME);
+        String parent = context.getDatabasePath(DATABASE_NAME).getParent();
+        File backupDest = Paths.get(parent, DATABASE_NAME  + "-backup").toFile();
+
+        try {
+            Operations.copy(dest, backupDest);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to backup the current databases", e);
+        }
+        try {
+
+            Operations.copy(src, dest);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to import the database from /sdcard" + dest.getPath(), e);
+        }
     }
 
     @Override

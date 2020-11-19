@@ -32,7 +32,10 @@ hs_err_pid*
 testnet.keystore
 testnet.keystore.credentials
 local.properties
-
+credentials
+keystore
 .gradle
 !gradle/wrapper/*.jar
 
+
+signing.properties

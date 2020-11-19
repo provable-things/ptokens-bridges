@@ -88,4 +88,6 @@ class CommandNames {
     static final String INTENT_RECIPIENT_NAME = "recipient";
 
     static final String INTENT_SAFETYNET_INCLUDED = "safetyNetIncluded";
+    static final String INTENT_SAFETYNET_APIKEY = "safetyNetApiKey";
+    static final String INTENT_PROOF_TYPE = "proofType";
 }

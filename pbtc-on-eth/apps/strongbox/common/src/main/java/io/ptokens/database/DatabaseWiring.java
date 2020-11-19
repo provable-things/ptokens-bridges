@@ -38,7 +38,6 @@ public class DatabaseWiring implements DatabaseInterface {
     private SQLiteDatabase db;
     private Map<String, byte[]> cache;
     private List<String> removedKeys;
-    private Strongbox strongbox;
     private boolean verifySignedStateHashEnabled;
     private boolean writeSignedStateHashEnabled;
 
@@ -52,7 +51,6 @@ public class DatabaseWiring implements DatabaseInterface {
         this.removedKeys = new ArrayList<>();
         this.cache = Collections.synchronizedMap(new HashMap<>());
         this.verifySignedStateHashEnabled = verifyStateHash;
-        this.strongbox = new Strongbox();
 
         SQLiteHelper.loadExtension(db);
     }
@@ -75,7 +73,7 @@ public class DatabaseWiring implements DatabaseInterface {
         removedKeys.remove(hexKey);
 
         if (dataSensitivity == (byte) 255) {
-            cache.put(hexKey, strongbox.encrypt(value));
+            cache.put(hexKey, Strongbox.encrypt(value));
         } else {
             cache.put(hexKey, value);
         }
@@ -92,9 +90,9 @@ public class DatabaseWiring implements DatabaseInterface {
                 return error;
             } else if (dataSensitivity == (byte) 255) {
                 try {
-                    return strongbox.decrypt(readCache(hexKey));
+                    return Strongbox.decrypt(readCache(hexKey));
                 } catch (NullPointerException e) {
-                    return strongbox.decrypt(readDatabase(hexKey));
+                    return Strongbox.decrypt(readDatabase(hexKey));
                 }
             } else {
                 try {
@@ -193,7 +191,7 @@ public class DatabaseWiring implements DatabaseInterface {
             throw new DatabaseException("Write signed state failed, hash not found");
         }
 
-        int aliasNumber = strongbox.getLatestAliasNumber();
+        int aliasNumber = Strongbox.getLatestAliasNumber();
 
         String oldAlias = Strongbox.ALIAS_STATE_SIGNING_KEY_PREFIX
                 + Strongbox.ALIAS_STATE_SIGNING_KEY_SEPARATOR
@@ -203,7 +201,7 @@ public class DatabaseWiring implements DatabaseInterface {
                 + (aliasNumber + 1);
         Strongbox.generateSigningKey(newAlias);
         Log.i(TAG, "✔ Switch key " + oldAlias + " <=> " + newAlias);
-        byte[] signedState = strongbox.sign(newAlias, hash);
+        byte[] signedState = Strongbox.sign(newAlias, hash);
 
         Log.i(TAG, "✔ New signed state hash " +
                 Base64.encodeToString(signedState, Base64.DEFAULT)
@@ -211,7 +209,7 @@ public class DatabaseWiring implements DatabaseInterface {
 
         Operations.writeBytes(context, NAME_SIGNED_STATE_HASH, signedState);
 
-        strongbox.removeKey(oldAlias);
+        Strongbox.removeKey(oldAlias);
     }
 
     private byte[] getCurrentStateHash() {
@@ -264,14 +262,14 @@ public class DatabaseWiring implements DatabaseInterface {
 
         // Reached this point the we have a signature and
         // a state hash
-        int aliasNumber = strongbox.getLatestAliasNumber();
+        int aliasNumber = Strongbox.getLatestAliasNumber();
         if (aliasNumber == -1) {
             throw new StrongboxException("✘ Unverifiable signature for existing state! Aborting!");
         }
         String alias = Strongbox.ALIAS_STATE_SIGNING_KEY_PREFIX
                 + Strongbox.ALIAS_STATE_SIGNING_KEY_SEPARATOR
                 + aliasNumber;
-        if (!strongbox.verify(alias, hash, signature)) {
+        if (!Strongbox.verify(alias, hash, signature)) {
             throw new StrongboxException("✘ Invalid signature for existing state!");
         } else {
             Log.i(TAG, "✔ Signed state hash verified");

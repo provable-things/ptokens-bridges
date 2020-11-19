@@ -1,19 +1,48 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
-InputStream localFile = rootProject
+File localFile = rootProject
     .file('local.properties')
-    .newDataInputStream();
+    
 
 Properties local = new Properties()
+def bridgeName
 
-local.load(localFile)
+if (localFile.exists()) {
+    local.load(localFile.newDataInputStream())
 
-def ptokensBridge = "p${local['conf.nativeSymbol']}on${local['conf.hostSymbol']}"
+    bridgeName = local['bridgeName']
+
+    if (bridgeName == null) {
+        bridgeName = System.env["BRIDGE_NAME"]
+    }
+
+    if (bridgeName == null) {
+        throw new GradleException("Bridge's name not set")
+    }
+    
+} else {
+    bridgeName = System.env["BRIDGE_NAME"]
+    if (bridgeName == null) {
+        throw new GradleException("Bridge's name not set")
+    }
+
+    // ANDROID_HOME should be set in order to find the 
+    // sdk.dir and ndk.dir location!
+}
+
+
+def nativeSymbol = bridgeName.split('-')[0].substring(1)
+def hostSymbol = bridgeName.split('-')[2]
+def ptokensBridge = "p${nativeSymbol}on${hostSymbol}"
 def ptokensAppId = "io.ptokens.${ptokensBridge}"
-def ptokensModuleName = "../common/jni/p${local['conf.nativeSymbol']}-on-${local['conf.hostSymbol']}"
+def ptokensModuleName = "../common/jni/${bridgeName}"
 
 android {
+    signingConfigs {
+        debugKeyProperties
+    }
+
     compileSdkVersion 29
 
     defaultConfig {
@@ -25,32 +54,13 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
-    signingConfigs {
-        release {
-            storeFile rootProject.file(local['keystore.store_file'])
-            keyPassword local['keystore.key_password']
-            storePassword local['keystore.store_password']
-            keyAlias local['keystore.key_alias']
-            v2SigningEnabled true
-        }
-    }
         
     buildTypes {
         debug {
-            buildConfigField("String",
-                    "SAFETY_NET_APIKEY",
-                    "\"${local["safetynet.apikey"]}\""
-            )
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debugKeyProperties
         }
 
-        release {
-            buildConfigField("String",
-                    "SAFETY_NET_APIKEY",
-                    "\"${local["safetynet.apikey"]}\""
-            )
-                        
+        release {        
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -76,16 +86,58 @@ android {
     }
 }
 
-task exportApk {
+task exportApkDebug {
     doLast {
         copy {
-            println "Copying apk..."
+            println "Copying apk debug..."
             from "build/outputs/apk/debug/app-debug.apk"
-            rename "app-debug.apk", "app-debug.apk"
+            rename "app-debug.apk", "${ptokensBridge}-debug.apk"
             into "../"
         }
     }
     dependsOn assemble
+}
+
+task exportApkDebugUnsigned {
+    doLast {
+        copy {
+            println "Copying apk debug..."
+            from "build/outputs/apk/debug/app-debug-unsigned.apk"
+            rename "app-debug-unsigned.apk", "${ptokensBridge}-debug.apk"
+            into "../"
+        }
+    }
+    dependsOn assemble
+}
+
+task exportApkRelease {
+    doLast {
+        copy {
+            println "Copying apk release..."
+            from "build/outputs/apk/release/app-release-unsigned.apk"
+            rename "app-release-unsigned.apk", "${ptokensBridge}-release.apk"
+            into "../"
+        }
+    }
+    dependsOn assemble
+}
+
+//Signed builds need a signing.properties file with keystore description, otherwise will generate unsigned
+def keyPropertiesFile = rootProject.file('signing.properties')
+
+if (keyPropertiesFile.exists()) {
+    println 'signing apk...'
+    def keyProperties = new Properties()
+    keyProperties.load(new FileInputStream(keyPropertiesFile))
+
+    android.buildTypes.debug.signingConfig.keyPassword keyProperties['keyPassword']
+    android.buildTypes.debug.signingConfig.storeFile rootProject.file(keyProperties['storeFile'])
+    android.buildTypes.debug.signingConfig.storePassword keyProperties['storePassword']
+    android.buildTypes.debug.signingConfig.keyAlias keyProperties['keyAlias']
+    android.buildTypes.debug.signingConfig.v2SigningEnabled true
+} else {
+    println 'signing.properties not found'
+    android.buildTypes.debug.signingConfig = null
 }
 
 cargo {
