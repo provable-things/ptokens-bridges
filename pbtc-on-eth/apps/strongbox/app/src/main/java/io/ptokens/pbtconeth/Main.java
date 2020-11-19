@@ -78,8 +78,6 @@ public class Main extends BaseActivity {
                     builder
             );
 
-            Log.d(TAG, "onReceive: builder is " + builder.isAsync());
-
             try {
                 wiring = new DatabaseWiring(
                         context,
@@ -89,8 +87,13 @@ public class Main extends BaseActivity {
                 );
 
                 jsonResult = (String) commandImpl.execute();
+                
+                if (!builder.getCommand().equals("generateProof")) {
+                    logResult(jsonResult);
+                }
             } catch (Exception e) {
                 Log.e(TAG, "✘ onReceive: Failed to parse the command", e);
+                logError("Invalid command submitted", 1);
             } finally {
                 wiring.close();
                 Log.i(TAG, "✔ Command "
@@ -106,7 +109,6 @@ public class Main extends BaseActivity {
                     Log.d(TAG, "✔ finish()");
                     finish();
                 } else {
-                    logResult(jsonResult);
                     Log.d(TAG, "✔ System.exit(0)");
                     System.exit(0);
                 }
@@ -116,17 +118,22 @@ public class Main extends BaseActivity {
 
 
     @SuppressWarnings("unused")
-    public void generateProof() {
-        String apiKey = BuildConfig.SAFETY_NET_APIKEY;
+    public void generateProof(String type, String safetyNetApiKey) {
         String enclaveStateJson = getEnclaveState(this);
-        byte[] cborEnclaveState = getCborEnclaveState(
-            enclaveStateJson, 
-            PBtcOnEthState.class
-        );
-
-        super.generateProof(apiKey, cborEnclaveState);
+        byte[] cborEnclaveState = getCborEnclaveState(enclaveStateJson, PBtcOnEthState.class);
+        super.generateProof(type, safetyNetApiKey, cborEnclaveState);
     }
-    
+
+    @SuppressWarnings("unused")
+    public String debugExportDatabaseToSd() {
+        return super.debugExportDatabaseToSd();
+    }
+
+    @SuppressWarnings("unused")
+    public String debugImportDatabaseFromSd() {
+        return super.debugImportDatabaseFromSd();
+    }
+
     @SuppressWarnings("unused")
     public static native String getEnclaveState(Main callback);
     @SuppressWarnings("unused")

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -19,6 +21,8 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
@@ -135,7 +139,7 @@ public class Strongbox {
         }
     }
 
-    private Key getSecretKey()
+    private static Key getSecretKey()
             throws
             KeyStoreException,
             NoSuchAlgorithmException,
@@ -151,7 +155,7 @@ public class Strongbox {
         return ks.getKey(ALIAS_SECRET_KEY, null);
     }
 
-    public void removeKey(String alias) {
+    public static void removeKey(String alias) {
         try {
             KeyStore ks = KeyStore.getInstance(ANDROID_KEY_STORE);
             ks.load(null);
@@ -163,7 +167,7 @@ public class Strongbox {
 
     }
 
-    public byte[] encrypt(byte[] data) {
+    public static byte[] encrypt(byte[] data) {
 
         try {
             Key key = getSecretKey();
@@ -200,7 +204,7 @@ public class Strongbox {
         return new byte[1];
     }
 
-    public byte[] decrypt(byte[] data) {
+    public static byte[] decrypt(byte[] data) {
         try {
             Key key = getSecretKey();
             byte[] iv = new byte[12];
@@ -236,7 +240,11 @@ public class Strongbox {
         return new byte[1];
     }
 
-    public byte[] sign(String alias, byte[] data) {
+    public static byte[] signWithAttestionKey(byte[] data) {
+        return sign(ALIAS_ATTESTATION_KEY, data);
+    }
+
+    public static byte[] sign(String alias, byte[] data) {
         byte[] signature = null;
         try {
             KeyStore ks = KeyStore.getInstance(ANDROID_KEY_STORE);
@@ -247,7 +255,8 @@ public class Strongbox {
                 return null;
             }
             Signature s = Signature.getInstance("SHA256withECDSA");
-            s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
+            PrivateKey privateKey = ((KeyStore.PrivateKeyEntry) entry).getPrivateKey();
+            s.initSign(privateKey);
             s.update(data);
 
             signature = s.sign();
@@ -259,7 +268,8 @@ public class Strongbox {
 
         return signature;
     }
-    public boolean verify(String alias, byte[] message, byte[] signature) {
+
+    public static boolean verify(String alias, byte[] message, byte[] signature) {
         try {
             KeyStore ks = KeyStore.getInstance(ANDROID_KEY_STORE);
             ks.load(null);
@@ -269,7 +279,7 @@ public class Strongbox {
                 return false;
             }
             Signature s = Signature.getInstance("SHA256withECDSA");
-            s.initVerify(((KeyStore.PrivateKeyEntry) entry).getCertificate());
+            s.initVerify(((KeyStore.PrivateKeyEntry) entry).getCertificate());  
             s.update(message);
 
             return s.verify(signature);
@@ -279,7 +289,7 @@ public class Strongbox {
         return false;
     }
 
-    public int getLatestAliasNumber() {
+    public static int getLatestAliasNumber() {
         int latestAlias = -1;
 
         try {

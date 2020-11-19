@@ -1,30 +1,49 @@
 # ptokens-strongbox-pbtc-on-eth
 
-Android App to interact with the pTokens core. 
+Android App executing the px-on-eth strongbox bridge.
 
-### Build
-
-A configuration file called `local.properties` must have the following:
+Create a `local.properties` file must have the following variables set:
 
  - `sdk.dir`: Android SDK location 
  - `ndk.dir`: Android NDK location
- - `keystore.store_file`: Keystore file location
- - `keystore.store_password`: Password to unlock the keystore
- - `keystore.key_alias`: Keystore's alias
- - `keystore.key_password`: Keystore's password
- - `conf.nativeSymbol`: Native symbol
- - `conf.hostSymbol`: Host symbol
+ - `bridgeName`: i.e. `pbtc-on-eth`
 
-```bash 
-./gradlew assembleRelease
+**Note**: you can avoid the creation of `local.properties` file by setting the ANDROID_HOME 
+env variable to the right location of the Android SDK, and by specifying the bridge name through 
+the BRIDGE_NAME env variable, like this
+
+```
+BRIDGE_NAME=pbtc-on-eth ./gradlew assembleDebug exportApk
 ```
 
-### Show nice logs:
+Also, in order to sign the apk with a custom keystore, create a `signing.properties`
+file in the project folder with the following information:
+
+ - `keyPassword`
+ - `storeFile`
+ - `storePassword`
+ - `keyAlias`
+
+## Show nice logs:
 
 ```bash
 cd logging
 ./show <deviceId> [D,I]
 ```
 
+## Build
 
+### Locally
 
+#### Requirements:
+  
+  - Java 8
+  - Rust (v1.46)
+  - Android-sdk (v29)
+  - Android-ndk (v20.1)
+
+#### Compile
+
+```bash 
+./gradlew assembleDebug exportApkDebug
+```

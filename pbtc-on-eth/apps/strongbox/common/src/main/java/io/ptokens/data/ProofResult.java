@@ -4,6 +4,7 @@ public class ProofResult {
     public String type;
     public byte version;
     public byte[] commitment;
+    public byte[] signedCommitment;
     public int commitmentTimestamp;
     public String safetyNetAttestation;
     public String certificateAttestation;
@@ -12,6 +13,7 @@ public class ProofResult {
             String type,
             byte version,
             byte[] commitment,
+            byte[] signedCommitment,
             int commitmentTimestamp,
             String safetyNetAttestation,
             String certificateAttestation
@@ -19,9 +21,17 @@ public class ProofResult {
         this.type = type;
         this.version = version;
         this.commitment = commitment;
+        this.signedCommitment = signedCommitment;
         this.commitmentTimestamp = commitmentTimestamp;
         this.safetyNetAttestation = safetyNetAttestation;
         this.certificateAttestation = certificateAttestation;
     }
 
+    public void setCertificateAttestation(String certificateAttestation) {
+        this.certificateAttestation = certificateAttestation;
+    }
+
+    public void setSafetyNetAttestation(String safetyNetAttestation) {
+        this.safetyNetAttestation = safetyNetAttestation;
+    }
 }

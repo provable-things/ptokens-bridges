@@ -89,6 +89,7 @@ public class Command {
 
             switch (type.getName()) {
                 case "java.lang.String":
+                    Log.v(TAG,"The value for " + argName + " set!");
                     addValueArg(argValueStr);
                     break;
                 case "java.lang.Long":
@@ -100,9 +101,12 @@ public class Command {
                 case "java.lang.Byte":
                     addValueArg(Byte.parseByte(argValueStr, 16));
                     break;
+                case "java.lang.Boolean":
+                    addValueArg(Boolean.parseBoolean(argValueStr));
+                    break;
                 default:
                     throw new InvalidCommandException(
-                            "✘ Intent's extra type " + type.getName() + "not implemented"
+                            "✘ Intent's extra type " + type.getName() + " not implemented"
                     );
             }
         } else {
@@ -192,9 +196,11 @@ public class Command {
                 case "java.lang.Short":
                     parametersTypes.add(short.class);
                     break;
+                case "java.lang.Boolean":
+                    parametersTypes.add(boolean.class);
+                    break;
                 default:
                     parametersTypes.add(clazz);
-
             }
         }
 
