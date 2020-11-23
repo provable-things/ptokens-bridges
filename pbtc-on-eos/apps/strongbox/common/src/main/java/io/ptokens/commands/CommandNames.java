@@ -36,6 +36,13 @@ class CommandNames {
     static final String DEBUG_PROXY_CHANGE_PNETWORK_TX = "debugErc777ProxyChangePNetwork";
     static final String DEBUG_PROXY_CHANGE_PNETWORK_BY_PROXY_TX = "debugErc777ProxyChangePNetworkByProxy";
 
+
+    static final String DEBUG_GET_PERC20_MIGRATION_TX = "debugMigrateContract";
+    static final String DEBUG_ADD_ERC20_DICTIONARY_ENTRY = "debugAddErc20DictionaryEntry";
+    static final String DEBUG_GET_ADD_SUPPORTED_TOKEN_TX = "debugGetAddSupportedTokenTx";
+    static final String DEBUG_GET_REMOVE_SUPPORTED_TOKEN_TX = "debugGetRemoveSupportedTokenTx";
+    static final String DEBUG_REMOVE_ERC20_DICTIONARY_ENTRY = "debugRemoveErc20DictionaryEntry";
+
     /*
      * Default intent values
      */
@@ -81,4 +88,6 @@ class CommandNames {
     static final String INTENT_RECIPIENT_NAME = "recipient";
 
     static final String INTENT_SAFETYNET_INCLUDED = "safetyNetIncluded";
+    static final String INTENT_SAFETYNET_APIKEY = "safetyNetApiKey";
+    static final String INTENT_PROOF_TYPE = "proofType";
 }

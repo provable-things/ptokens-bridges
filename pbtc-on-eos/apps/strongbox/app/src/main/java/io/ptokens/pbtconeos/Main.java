@@ -83,13 +83,18 @@ public class Main extends BaseActivity {
                 wiring = new DatabaseWiring(
                         context,
                         commandImpl.getDatabase(),
-                        FLAG_WRITE_STATE_HASH,
-                        FLAG_VERIFY_STATE_HASH 
+                        FLAG_VERIFY_STATE_HASH,
+                        FLAG_WRITE_STATE_HASH
                 );
 
                 jsonResult = (String) commandImpl.execute();
+
+                if (!builder.getCommand().equals("generateProof")) {
+                    logResult(jsonResult);
+                }
             } catch (Exception e) {
                 Log.e(TAG, "✘ onReceive: Failed to parse the command", e);
+                logError("Invalid command submitted", 1);
             } finally {
                 wiring.close();
                 Log.i(TAG, "✔ Command "
@@ -105,7 +110,6 @@ public class Main extends BaseActivity {
                     Log.d(TAG, "✔ finish()");
                     finish();
                 } else {
-                    logResult(jsonResult);
                     Log.d(TAG, "✔ System.exit(0)");
                     System.exit(0);
                 }
@@ -114,14 +118,10 @@ public class Main extends BaseActivity {
     };
 
     @SuppressWarnings("unused")
-    public void generateProof(boolean safetyNetIncluded) {
-        String apiKey = BuildConfig.SAFETY_NET_APIKEY;
+    public void generateProof(String type, String safetyNetApiKey) {
         String enclaveStateJson = getEnclaveState(this);
-        byte[] cborEnclaveState = getCborEnclaveState(
-            enclaveStateJson, 
-            PBtcOnEosState.class
-        );
-        super.generateProof(apiKey, cborEnclaveState, safetyNetIncluded);
+        byte[] cborEnclaveState = getCborEnclaveState(enclaveStateJson, PBtcOnEosState.class);
+        super.generateProof(type, safetyNetApiKey, cborEnclaveState);
     }
 
     @SuppressWarnings("unused")

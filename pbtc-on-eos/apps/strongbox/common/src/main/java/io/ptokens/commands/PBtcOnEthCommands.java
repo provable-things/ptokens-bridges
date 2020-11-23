@@ -24,9 +24,9 @@ public class PBtcOnEthCommands extends CommandInterface {
         map.put(DEBUG_GET_KEY_FROM_DB, getGetKeyBuilder());
         map.put(DEBUG_SET_KEY_IN_DB_TO_VALUE, getSetKeyBuilder());
         map.put(SIGN_MESSAGE_WITH_ETH_KEY, getSignMessageWithKeyBuilder());
-        map.put(DEBUG_CHANGE_PNETWORK_TX, getDebugErc777ChangePNetworkBuilder());
-        map.put(DEBUG_PROXY_CHANGE_PNETWORK_TX, getDebugErc777ChangePNetworkBuilder());
-        map.put(DEBUG_PROXY_CHANGE_PNETWORK_BY_PROXY_TX, getDebugErc777ChangePNetworkBuilder());
+        map.put(DEBUG_CHANGE_PNETWORK_TX, getWriteableDbWithAddressParameterBuilder());
+        map.put(DEBUG_PROXY_CHANGE_PNETWORK_TX, getWriteableDbWithAddressParameterBuilder());
+        map.put(DEBUG_PROXY_CHANGE_PNETWORK_BY_PROXY_TX, getWriteableDbWithAddressParameterBuilder());
         map.put(DEBUG_REPROCESS_ETH_BLOCK, getReadPayloadAndWriteableDbBuilder());
         map.put(DEBUG_REPROCESS_BTC_BLOCK, getReadPayloadAndWriteableDbBuilder());
         map.put(DEBUG_MINT_PBTC, getMintTransactionBuilder());

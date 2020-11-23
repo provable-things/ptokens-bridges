@@ -10,8 +10,8 @@ public class PBtcOnEosState extends BtcState {
     private String _eosPublicKey;
     private String _eosAccountName;
     private String _eosLastSeenBlockId;
-    private String _safeBtcAddress;
-    private String _safeEosAddress;
+    private String _btcSafeAddress;
+    private String _eosSafeAddress;
     private String _btcSignatureNonce;
     private String _eosSignatureNonce;
     private String _eosLastSeenBlockNum;
@@ -72,8 +72,8 @@ public class PBtcOnEosState extends BtcState {
     @JsonProperty("eos_last_seen_block_id")
     public String getEosLastSeenBlockId() { return _eosLastSeenBlockId; }
 
-    @JsonProperty("safe_eos_address")
-    public String getSafeEosAddress() { return _safeEosAddress; }
+    @JsonProperty("eos_safe_address")
+    public String getEosSafeAddress() { return _eosSafeAddress; }
 
     @JsonProperty("btc_signature_nonce")
     public String getBtcSignatureNonce() { return _btcSignatureNonce; }
@@ -90,8 +90,8 @@ public class PBtcOnEosState extends BtcState {
     @JsonProperty("eos_enabled_protocol_features")
     public List<ProtocolFeature> getEosEnabledProtocolFeatures() { return _eosEnabledProtocolFeatures; }
 
-    @JsonProperty("safe_btc_address")
-    public String getSafeBtcAddress() { return _safeBtcAddress; }
+    @JsonProperty("btc_safe_address")
+    public String getBtcSafeAddress() { return _btcSafeAddress; }
 
     public  void setEosSymbol(String _eosSymbol) {
         this._eosSymbol = _eosSymbol;
@@ -113,8 +113,8 @@ public class PBtcOnEosState extends BtcState {
         this._eosLastSeenBlockId = _eosLastSeenBlockId;
     }
 
-    public  void setSafeEosAddress(String _safeEosAddress) {
-        this._safeEosAddress = _safeEosAddress;
+    public  void setEosSafeAddress(String _eosSafeAddress) {
+        this._eosSafeAddress = _eosSafeAddress;
     }
 
     public  void setBtcSignatureNonce(String _btcSignatureNonce) {
@@ -137,7 +137,7 @@ public class PBtcOnEosState extends BtcState {
         this._eosEnabledProtocolFeatures = _eosEnabledProtocolFeatures;
     }
 
-    public void setSafeBtcAddress(String _safeBtcAddress) {
-        this._safeBtcAddress = _safeBtcAddress;
+    public void setBtcSafeAddress(String _btcSafeAddress) {
+        this._btcSafeAddress = _btcSafeAddress;
     }
 }
