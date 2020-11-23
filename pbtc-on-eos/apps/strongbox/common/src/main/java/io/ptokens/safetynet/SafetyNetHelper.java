@@ -40,8 +40,8 @@ public class SafetyNetHelper {
     private static final String TAG = SafetyNetHelper.class.getName();
 
     private static final byte PROOF_VERSION = 0;
-    private static final String PROOF_TYPE = "strongbox";
 
+    private String proofType = "strongbox";
 
     private byte[] nonce;
     private String packageName;
@@ -56,7 +56,7 @@ public class SafetyNetHelper {
     private Integer mRetriesMax;
     private Integer retriesCounter = 0;
     private String mApiKey;
-    private String attestationJson = "";
+    private String serializedProofJson = "";
     private byte[] cborEncodedState;
     private int commitmentTimestamp;
     private byte[] commitment;
@@ -71,7 +71,7 @@ public class SafetyNetHelper {
         this.mApiKey = builder.apiKey;
         this.commitmentTimestamp = builder.commitmentTimestamp;
         this.cborEncodedState = builder.cborEncodedState;
-
+        this.proofType = builder.proofType;
         this.commitment = getCommitment();
         this.nonce = getAttestationNonce(this.commitment);
     }
@@ -260,12 +260,18 @@ public class SafetyNetHelper {
         private Integer timeoutBetweenRetries;
         private Integer retriesMax;
         private String apiKey;
+        private String proofType;
         private int commitmentTimestamp;
         private byte[] cborEncodedState = null;
 
         public Builder(SafetyNetClient client, String apiKey) {
             this.client = client;
             this.apiKey = apiKey;
+        }
+
+        public Builder setProofType(String proofType) {
+            this.proofType = proofType;
+            return this;
         }
 
         public Builder setCurrentState(byte[] cborEncodedState) {
@@ -306,6 +312,11 @@ public class SafetyNetHelper {
         public SafetyNetHelper build() {
             return new SafetyNetHelper(this);
         }
+
+        public Builder setApiKey(String apikey) {
+            this.apiKey = apikey;
+            return this;
+        }
     }
 
     private byte[] getCommitment() {
@@ -337,74 +348,75 @@ public class SafetyNetHelper {
         return Strongbox.signWithAttestionKey(commitment);
     }
 
-    public void getAttestation(Logger logger, boolean safetynetIncluded) {
-        Context context = client.getApplicationContext();
-        final int isGoogleAvailable = checkGoogleServicesAvailability(context);
-
-        if (safetynetIncluded) {
-            Log.d(TAG, "Safety is included, performing call to Google...");
-            requestTest(new SafetyNetHelper.SafetyNetWrapperCallback() {
-                @Override
-                public void error(String errorType, String errorValue) {
-                    Log.e(TAG, "✘ Failed to make the request, error type:"
-                            + errorType
-                            + " isGoogleAvailable: "
-                            + isGoogleAvailable
-                    );
-                }
-
-                @Override
-                public void success(SafetyNetResponse response, String attestationResult) {
-                    String serializedAttestation = Utils.serializeAttestationResult(attestationResult);
-                    String serializedCertChain = Strongbox.getCertificateAttestation();
-
-                    ProofResult proofResult = new ProofResult(
-                            PROOF_TYPE,
-                            PROOF_VERSION,
-                            commitment,
-                            nonce,
-                            commitmentTimestamp,
-                            serializedAttestation,
-                            serializedCertChain
-                    );
-
-                    ObjectMapper mapper = new ObjectMapper();
-
-                    try {
-                        attestationJson = mapper.writeValueAsString(proofResult);
-                        logger.logResult(attestationJson);
-                    } catch (JsonProcessingException e) {
-                        Log.e(TAG, "✘ Failed to write the attestation json response", e);
-                        logger.logError("Failed to write the resp", 1);
-                    }
-                }
-            });
-        } else {
-            Log.d(TAG, "Safety not included, delivering Strongbox...");
-
-            String serializedCertChain = Strongbox.getCertificateAttestation();
-            String safetyNetAttestion = "";
-            ProofResult proofResult = new ProofResult(
-                    PROOF_TYPE,
-                    PROOF_VERSION,
-                    commitment,
-                    nonce,
-                    commitmentTimestamp,
-                    safetyNetAttestion,
-                    serializedCertChain
-            );
-
+    private void serializeProofToResultFile(Logger logger, ProofResult proofResult) {
             ObjectMapper mapper = new ObjectMapper();
 
             try {
-                attestationJson = mapper.writeValueAsString(proofResult);
-                logger.logResult(attestationJson);
+                serializedProofJson = mapper.writeValueAsString(proofResult);
+                logger.logResult(serializedProofJson);
             } catch (JsonProcessingException e) {
                 Log.e(TAG, "✘ Failed to write the attestation json response", e);
                 logger.logError("Failed to write the resp", 1);
             }
-        }
+    }
 
+
+    public void requestSafetyNetAndAddToProofObject(Logger logger, ProofResult proofResult) {
+        requestTest(new SafetyNetHelper.SafetyNetWrapperCallback() {
+            @Override
+            public void error(String errorType, String errorValue) {
+                logger.logError("Failed to make the request, error type:" + errorType, 6);
+            }
+
+            @Override
+            public void success(SafetyNetResponse response, String attestationResult) {
+                String serializedAttestation = Utils.serializeAttestationResult(attestationResult);
+                proofResult.setSafetyNetAttestation(serializedAttestation);
+                serializeProofToResultFile(logger, proofResult);
+            }
+        });
+    }
+
+    public void getAttestation(Logger logger) {
+        Context context = client.getApplicationContext();
+        final int isGoogleAvailable = checkGoogleServicesAvailability(context);
+
+        String safetynetAttestation = "";
+        String serializedCertChain = "";
+
+        ProofResult proofResult = new ProofResult(
+            proofType, 
+            PROOF_VERSION, 
+            commitment, 
+            nonce, 
+            commitmentTimestamp, 
+            safetynetAttestation, 
+            serializedCertChain
+        );
+
+        switch (proofType) {
+            case "strongbox":
+                serializedCertChain = Strongbox.getCertificateAttestation();
+                proofResult.setCertificateAttestation(serializedCertChain);
+                
+                // If apikey has a value, return safetynet as well
+                if (mApiKey.equals("") || mApiKey == null) {
+                    serializeProofToResultFile(logger, proofResult);                    
+                } else {
+                    requestSafetyNetAndAddToProofObject(logger, proofResult);
+                }
+                break;
+
+            case "safetynet":
+                if (mApiKey.equals("") || mApiKey == null) {
+                    Log.e(TAG, "✘ Requesting safetynet proof without an apikey, this will probably fail...");
+                }
+                requestSafetyNetAndAddToProofObject(logger, proofResult);
+                break;
+
+            default:
+                logger.logError("Invalid proof type submitted: " + proofType, 6);
+        }
     }
 
     private int checkGoogleServicesAvailability(Context context) {

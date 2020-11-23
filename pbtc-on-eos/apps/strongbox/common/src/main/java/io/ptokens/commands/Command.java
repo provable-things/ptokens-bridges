@@ -89,6 +89,7 @@ public class Command {
 
             switch (type.getName()) {
                 case "java.lang.String":
+                    Log.v(TAG,"The value for " + argName + " set!");
                     addValueArg(argValueStr);
                     break;
                 case "java.lang.Long":

@@ -27,4 +27,11 @@ public class ProofResult {
         this.certificateAttestation = certificateAttestation;
     }
 
+    public void setCertificateAttestation(String certificateAttestation) {
+        this.certificateAttestation = certificateAttestation;
+    }
+
+    public void setSafetyNetAttestation(String safetyNetAttestation) {
+        this.safetyNetAttestation = safetyNetAttestation;
+    }
 }
