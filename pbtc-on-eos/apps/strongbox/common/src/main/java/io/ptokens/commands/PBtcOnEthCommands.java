@@ -32,5 +32,6 @@ public class PBtcOnEthCommands extends CommandInterface {
         map.put(DEBUG_MINT_PBTC, getMintTransactionBuilder());
         map.put(DEBUG_BACKUP_DATABASE, getReadableDbBuilder());
         map.put(DEBUG_IMPORT_DATABASE, getReadableDbBuilder());
+        map.put(DEBUG_GET_CHILD_PAYS_FOR_PARENT_TX, getChildPaysForParentTxDbBuilder());
     }
 }

@@ -28,5 +28,6 @@ public class PBtcOnEosCommands extends CommandInterface {
         map.put(DISABLE_EOS_PROTOCOL_FEATURE, getProtocolFeaturesBuilder());
         map.put(DEBUG_REPROCESS_BTC_BLOCK, getReadPayloadAndWriteableDbBuilder());
         map.put(DEBUG_REPROCESS_EOS_BLOCK, getReadPayloadAndWriteableDbBuilder());
+        map.put(DEBUG_GET_CHILD_PAYS_FOR_PARENT_TX, getChildPaysForParentTxDbBuilder());
     }
 }

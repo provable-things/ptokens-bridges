@@ -171,5 +171,11 @@ public class Main extends BaseActivity {
     public static native String disableEosProtocolFeature(Main callback, String featureHash);
     @SuppressWarnings("unused")
     public static native String debugGetAllDbKeys(Main callback);
-    
+    @SuppressWarnings("unused")
+    public static native String debugGetChildPaysForParentTx(
+        Main callback, 
+        long fee, 
+        String txId, 
+        int vout
+    );
 }

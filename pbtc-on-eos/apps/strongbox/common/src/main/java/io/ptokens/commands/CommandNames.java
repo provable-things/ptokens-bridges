@@ -25,6 +25,7 @@ class CommandNames {
     static final String DEBUG_REPROCESS_BTC_BLOCK = "debugReprocessBtcBlock";
     static final String DEBUG_REPROCESS_ETH_BLOCK = "debugReprocessEthBlock";
     static final String DEBUG_REPROCESS_EOS_BLOCK = "debugReprocessEosBlock";
+    static final String DEBUG_GET_CHILD_PAYS_FOR_PARENT_TX = "debugGetChildPaysForParentTx";
     static final String DEBUG_MINT_PBTC = "debugMintTransaction";
     static final String ENABLE_EOS_PROTOCOL_FEATURE = "enableEosProtocolFeature";
     static final String DISABLE_EOS_PROTOCOL_FEATURE = "disableEosProtocolFeature";
@@ -90,4 +91,7 @@ class CommandNames {
     static final String INTENT_SAFETYNET_INCLUDED = "safetyNetIncluded";
     static final String INTENT_SAFETYNET_APIKEY = "safetyNetApiKey";
     static final String INTENT_PROOF_TYPE = "proofType";
+
+    static final String INTENT_TXID_NAME = "txId";
+    static final String INTENT_VOUT_NAME = "vOut";
 }
