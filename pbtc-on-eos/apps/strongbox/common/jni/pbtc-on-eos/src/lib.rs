@@ -29,6 +29,7 @@ use ptokens_core::btc_on_eos::{
     enable_eos_protocol_feature,
     disable_eos_protocol_feature,
     debug_set_key_in_db_to_value,
+    debug_get_child_pays_for_parent_btc_tx,
     debug_reprocess_btc_block_for_stale_eos_tx,
     debug_clear_all_utxos,
     debug_reprocess_eos_block
@@ -624,6 +625,36 @@ pub extern "C" fn Java_io_ptokens_pbtconeos_Main_debugReprocessEosBlock(
         .expect("✘ Failed to open the database");
 
     let result = match debug_reprocess_eos_block(db, &block_json) {
+        Ok(r) => r,
+        Err(e) => format!("{{\"error\": {:?}}}", e.to_string())
+    }; 
+
+    _env.new_string(&result)
+        .unwrap()
+        .into_inner()
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "C" fn Java_io_ptokens_pbtconeos_Main_debugGetChildPaysForParentTx(
+    _env: JNIEnv,
+    _class: JClass,
+    _callback: JObject,
+    _fee: u64,
+    _txId: JString,
+    _vOut: u32
+) -> jstring {
+    unsafe { set_callback_global_ref(&_env, &_callback); }
+
+    let txId: String = _env
+        .get_string(_txId)
+        .expect("✘ Couldn't convert java.lang.String to String")
+        .into();
+
+    let db = get_database()
+        .expect("✘ Failed to open the database");
+
+    let result = match debug_get_child_pays_for_parent_btc_tx(db, _fee, &txId, _vOut) {
         Ok(r) => r,
         Err(e) => format!("{{\"error\": {:?}}}", e.to_string())
     }; 

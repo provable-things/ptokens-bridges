@@ -135,6 +135,21 @@ public abstract class CommandInterface {
         return c;
     }
 
+    Command getChildPaysForParentTxDbBuilder() {
+        Command c = null;
+        try {
+            c = builder.copy()
+            .isNative()
+            .needsWritableDatabase()
+            .addIntentArg(INTENT_FEE_NAME, null, Long.class)
+            .addIntentArg(INTENT_TXID_NAME, null, String.class)
+            .addIntentArg(INTENT_VOUT_NAME, null, Integer.class);
+        } catch(InvalidCommandException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return c;
+    }
+
     Command getGetKeyBuilder() {
         Command c = null;
         try {
